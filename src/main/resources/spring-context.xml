@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+                        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+                        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- 自动扫描注解 -->
+    <context:component-scan base-package="org.wangbiao.ssi"/>
+    <!-- 读取配置文件 -->
+    <context:property-placeholder location="classpath:config.properties"/>
+
+    <!-- dataSource -->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${jdbc.driverClassName}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+    <!-- TransactionManager -->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- spring整合mybatis -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="classpath:sqlMapConfig.xml"/>
+        <property name="mapperLocations" value="classpath*:org/wangbiao/ssi/sql/*Mapper.xml"/>
+    </bean>
+    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="sqlSessionFactory"/>
+    </bean>
+
+    <!-- 启用事务注解的支持,并把优先级设为最高 -->
+    <tx:annotation-driven transaction-manager="txManager" order="0"/>
+
+    <tx:advice id="txAdvice" transaction-manager="txManager">
+        <tx:attributes>
+            <tx:method name="get*" read-only="true"/>
+            <tx:method name="query*" read-only="true"/>
+            <tx:method name="find*" read-only="true"/>
+            <tx:method name="list*" read-only="true"/>
+            <tx:method name="*" propagation="REQUIRED" isolation="DEFAULT"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!-- 配置spring使用cglib代理 -->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+    <!-- 配置切面 -->
+    <aop:config>
+        <aop:advisor advice-ref="txAdvice" pointcut="execution(* org.wangbiao.ssi..*Service.*(..))"/>
+    </aop:config>
+</beans>

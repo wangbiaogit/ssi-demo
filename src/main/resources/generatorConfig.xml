@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE generatorConfiguration PUBLIC
+        "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<!-- 默认文件名为:generatorConfig.xml-->
+<generatorConfiguration>
+    <!-- 制定mysql的驱动包的路径 千万别放中文路径下 -->
+    <classPathEntry location="/Users/Meiling/Dev-tools/maven-repo/repo/mysql/mysql-connector-java/5.1.28/mysql-connector-java-5.1.28.jar"/>
+    <!-- 配置数据源和生成的代码所存放的位置 -->
+    <context id="context1">
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://localhost:3307/ssi_test"
+                        userId="root"
+                        password="root"/>
+        <!-- 所生成的实体类的位置默认资源包src -->
+        <javaModelGenerator targetPackage="org.wangbiao.ssi.model" targetProject="src/main/java">
+            <property name="enableSubPackage" value="true"/>
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+        <!-- 所生成的sqlMap的影射文件的位置,默认资源包src -->
+        <sqlMapGenerator targetPackage="org.wangbiao.ssi.sql" targetProject="src/main/java">
+            <property name="enableSubPackage" value="true"/>
+        </sqlMapGenerator>
+        <!-- Mapper接口 -->
+        <javaClientGenerator type="XMLMAPPER" targetPackage="org.wangbiao.ssi.sql" targetProject="src/main/java">
+            <property name="enableSubPackage" value="true"/>
+        </javaClientGenerator>
+
+        <!-- 为哪些表生成代码 tableName:表名 schema:不用填写 -->
+        <table schema="" tableName="person" enableCountByExample="false"
+               enableUpdateByExample="false" enableDeleteByExample="false"
+               enableSelectByExample="false" selectByExampleQueryId="false">
+        </table>
+
+    </context>
+</generatorConfiguration>
